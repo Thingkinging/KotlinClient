@@ -3,10 +3,11 @@ package com.kwh.dailyq.api.response
 import java.time.LocalDate
 import java.util.*
 
-data class Question(
-    val id: LocalDate,
-    val text: String,
-    val answerCount: Int,
+data class Answer(
+    val qid: LocalDate,
+    val uid: String,
+    val text: String?,
+    val photo: String?,
     val updatedAt: Date,
     val createdAt: Date
 )
