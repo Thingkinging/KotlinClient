@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import coil.load
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.kwh.dailyq.R
@@ -16,6 +17,7 @@ import com.kwh.dailyq.api.response.HelloWorld
 import com.kwh.dailyq.api.response.Question
 import com.kwh.dailyq.databinding.FragmentTodayBinding
 import com.kwh.dailyq.ui.base.BaseFragment
+import com.kwh.dailyq.ui.image.ImageViewerActivity
 import com.kwh.dailyq.ui.write.WriteActivity
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -141,6 +143,18 @@ class TodayFragment : BaseFragment() {
         binding.textAnswer.text = answer?.text
 
         binding.writeButton.isVisible = answer == null
+
+        binding.photoAnswer.isVisible = !answer?.photo.isNullOrEmpty()
+        answer?.photo?.let {
+            binding.photoAnswer.load(it){
+                placeholder(R.drawable.ph_image)
+            }
+            binding.photoAnswer.setOnClickListener{
+                startActivity(Intent(requireContext(), ImageViewerActivity::class.java).apply {
+                    putExtra(ImageViewerActivity.EXTRA_URL, answer.photo)
+                })
+            }
+        }
     }
 
     override fun onDestroyView() {
