@@ -10,6 +10,7 @@ import com.kwh.dailyq.api.response.Answer
 import com.kwh.dailyq.api.response.AuthToken
 import com.kwh.dailyq.api.response.Image
 import com.kwh.dailyq.api.response.Question
+import okhttp3.Cache
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -26,17 +27,23 @@ interface ApiService {
     companion object {
         private var INSTANCE: ApiService? = null
 
-        private fun okHttpClient(): OkHttpClient {
+        private fun okHttpClient(context: Context): OkHttpClient {
             val builder = OkHttpClient.Builder()
 
             val logging = HttpLoggingInterceptor()
             logging.level = HttpLoggingInterceptor.Level.BODY
 
+            val cacheSize = 5 * 1024 * 1024L
+            val cache = Cache(context.cacheDir, cacheSize)
+
             return builder
                 .connectTimeout(3, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(10, TimeUnit.SECONDS)
+                .cache(cache)
                 .addInterceptor(AuthInterceptor())
+                .addInterceptor(EndpointLoggingInterceptor("AppInterceptor", "answers"))
+                .addNetworkInterceptor(EndpointLoggingInterceptor("NetworkInterceptor", "answers"))
                 .authenticator(TokenRefreshAuthenticator())
                 .addInterceptor(logging)
                 .build()
@@ -52,7 +59,7 @@ interface ApiService {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addConverterFactory(LocalDateConverterFactory())
                 .baseUrl("http://192.168.0.12:5000")
-                .client(okHttpClient())
+                .client(okHttpClient(context))
                 .build()
                 .create(ApiService::class.java)
         }
@@ -83,10 +90,21 @@ interface ApiService {
         @Tag authType: AuthType = AuthType.NO_AUTH
     ) : Call<AuthToken>
 
+    @GET("/v2/questions")
+    suspend fun getQuestions(
+        @Query("from_date") fromDate: LocalDate,
+        @Query("page_size") pageSize: Int
+    ): Response<List<Question>>
+
     @GET("/v2/questions/{qid}")
     suspend fun getQuestion(
         @Path("qid") qid: LocalDate
     ): Response<Question>
+
+    @GET("/v2/questions/{qid}/answers")
+    suspend fun getAnswers(
+        @Path("qid") qid: LocalDate
+    ) : Response<List<Answer>>
 
     @GET("/v2/questions/{qid}/answers/{uid}")
     suspend fun getAnswer(

@@ -9,5 +9,7 @@ data class Answer(
     val text: String?,
     val photo: String?,
     val updatedAt: Date,
-    val createdAt: Date
+    val createdAt: Date,
+
+    val answerer: User?
 )
