@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kwh.dailyq.R
 import com.kwh.dailyq.api.response.Question
 import com.kwh.dailyq.databinding.ItemTimelineCardBinding
+import com.kwh.dailyq.db.entiry.QuestionEntity
 import com.kwh.dailyq.ui.details.DetailsActivity
 import java.time.format.DateTimeFormatter
 
@@ -15,7 +16,7 @@ class TimelineCardViewHolder(val binding: ItemTimelineCardBinding) :
         val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy. M. d.")
     }
 
-    fun bind(question: Question) {
+    fun bind(question: QuestionEntity) {
         binding.date.text = DATE_FORMATTER.format(question.id)
         binding.question.text = question.text ?: ""
 

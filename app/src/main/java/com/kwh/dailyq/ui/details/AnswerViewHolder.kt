@@ -10,6 +10,7 @@ import com.kwh.dailyq.R
 import com.kwh.dailyq.api.response.Answer
 import com.kwh.dailyq.databinding.ItemAnswerBinding
 import com.kwh.dailyq.ui.image.ImageViewerActivity
+import com.kwh.dailyq.ui.profile.ProfileActivity
 
 class AnswerViewHolder(val binding: ItemAnswerBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -22,6 +23,13 @@ class AnswerViewHolder(val binding: ItemAnswerBinding) : RecyclerView.ViewHolder
                 error(R.drawable.ph_user)
                 transformations(CircleCropTransformation())
             }
+        }
+
+        binding.userPhoto.setOnClickListener {
+            val context = itemView.context
+            context.startActivity(Intent(context, ProfileActivity::class.java).apply {
+                putExtra(ProfileActivity.EXTRA_UID, answer.answerer?.id)
+            })
         }
 
         binding.textAnswer.text = answer.text

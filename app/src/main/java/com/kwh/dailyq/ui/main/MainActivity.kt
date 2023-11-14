@@ -3,6 +3,7 @@ package com.kwh.dailyq.ui.main
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.google.android.material.navigation.NavigationBarItemView
+import com.kwh.dailyq.AuthManager
 import com.kwh.dailyq.R
 import com.kwh.dailyq.databinding.ActivityMainBinding
 import com.kwh.dailyq.ui.base.BaseActivity
@@ -33,7 +34,11 @@ class MainActivity : BaseActivity() {
                     supportActionBar?.setTitle(R.string.title_today)
                 }
                 R.id.profile -> {
-                    ft.replace(R.id.host, ProfileFragment())
+                    ft.replace(R.id.host, ProfileFragment().apply {
+                        arguments = Bundle().apply {
+                            putString(ProfileFragment.ARG_UID, AuthManager.uid)
+                        }
+                    })
                     supportActionBar?.setTitle(R.string.title_profile)
                 }
             }

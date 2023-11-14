@@ -6,10 +6,7 @@ import com.google.gson.GsonBuilder
 import com.kwh.dailyq.AuthManager
 import com.kwh.dailyq.api.adapter.LocalDateAdapter
 import com.kwh.dailyq.api.converter.LocalDateConverterFactory
-import com.kwh.dailyq.api.response.Answer
-import com.kwh.dailyq.api.response.AuthToken
-import com.kwh.dailyq.api.response.Image
-import com.kwh.dailyq.api.response.Question
+import com.kwh.dailyq.api.response.*
 import okhttp3.Cache
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -140,5 +137,26 @@ interface ApiService {
     suspend fun uploadImage(
         @Part image: MultipartBody.Part
     ) : Response<Image>
+
+    @GET("/v2/users/{uid}")
+    suspend fun getUser(
+        @Path("uid") uid: String
+    ) : Response<User>
+
+    @POST("/v2/user/following/{uid}")
+    suspend fun follow(
+        @Path("uid") uid: String
+    ) : Response<Unit>
+
+    @DELETE("/v2/user/following/{uid}")
+    suspend fun unfollow(
+        @Path("uid") uid: String
+    ) : Response<Unit>
+
+    @GET("/v2/users/{uid}/answers")
+    suspend fun getUserAnswers(
+        @Path("uid") uid: String,
+        @Query("from_date") fromDate: LocalDate? = null
+    ) : Response<List<QuestionAndAnswer>>
 
 }

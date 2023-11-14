@@ -5,11 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadState
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.kwh.dailyq.databinding.FragmentTimelineBinding
 import com.kwh.dailyq.ui.base.BaseFragment
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -31,13 +34,23 @@ class TimelineFragment : BaseFragment() {
 
         binding.apply {
             adapter = TimelineAdapter(requireContext())
+
+            recycler.adapter = adapter.withLoadStateFooter(TimelineLoadStateAdapter {
+                adapter.retry()
+            })
+
             recycler.adapter = adapter
             recycler.layoutManager = LinearLayoutManager(context)
         }
 
         lifecycleScope.launch {
-            Pager(PagingConfig(initialLoadSize = 6, pageSize = 3, enablePlaceholders = false)) {
-                TimelinePagingSource(api)
+            @OptIn(ExperimentalPagingApi::class)
+            Pager(
+                PagingConfig(initialLoadSize = 6, pageSize = 3, enablePlaceholders = false),
+                null,
+                TimelineRemoteMediator(api, db)
+            ) {
+                db.getQuestionDao().getPagingSource()
             }.flow.collectLatest {
                 adapter.submitData(it)
             }
